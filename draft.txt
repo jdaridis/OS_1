@@ -1,0 +1,59 @@
+shm:
+sem st_mngr_in = 0;
+sem st_mngr_out = 0;
+sem in_queue = 0;
+sem out_queue = 0;
+sem man = 1;
+sem mutex = 1;
+Ledger ledger;
+
+Station manager{
+
+    while(1){
+        print "Waiting for someone to get in"
+        P(st_mngr_in);
+        print "Permission to get in requested"
+        while(has_room){
+            print "Permission granted"
+            V(in_queue);
+            P(man);
+            inside...{
+                P(mutex);
+                ledger.arrive(bus);
+                V(mutex);
+            }
+        }
+        print "Waiting for someone to get out"
+        P(st_mngr_out);
+        print "Permission to get out requested"
+        print "Permission granted"
+        V(out_queue);
+        outside..{
+            P(mutex);
+            ledger.leave(bus);
+            V(mutex);
+        }
+    }
+}
+
+
+Bus{
+    print "Requesting in. ID ...."
+    V(st_mngr_in);
+    P(in_queue);
+    print "Getting in station"
+    print "Maneuvering in station"
+    sleep(mantime);
+    print "Parked"
+    V(man);
+    inside...{
+        P(mutex);
+        ledger.people_arrive(bus);
+        V(mutex);
+        sleep(time);
+    }
+    print "Requesting out. ID...."
+    V(st_mngr_out);
+    P(out_queue);
+    print "Out safely"
+}
