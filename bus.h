@@ -5,4 +5,5 @@ typedef struct bus{
     int people;
     int capacity;
     int parkperiod;
+    int mantime;
 } bus;

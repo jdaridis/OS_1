@@ -1,0 +1,6 @@
+*.o
+mystation
+station-manager
+bus
+*.sh
+config.txt
