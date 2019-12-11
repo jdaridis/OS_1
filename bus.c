@@ -16,6 +16,7 @@ int main(int argc, char const *argv[]){
     int error;
     int i;
     int final_bay;
+    int spot;
     while(--argc){
         if(strcmp(*argv, "-t") == 0){
 			if(strcmp(*(argv + 1), "VOR") == 0){
@@ -25,7 +26,6 @@ int main(int argc, char const *argv[]){
             } else {
                 temp_bus.type = 2;
             }
-            printf("TYPE %d \n", temp_bus.type);
 		} else if(strcmp(*argv, "-n") == 0){
 			temp_bus.people = atoi(*(argv + 1));
 		} else if(strcmp(*argv, "-c") == 0){
@@ -47,46 +47,53 @@ int main(int argc, char const *argv[]){
     sem_wait(&(data->mutex));
     data->total_buses++;
     id = data->total_buses;
-    sem_post(&(data->mutex));
-
+    temp_bus.id = id;
+    data->in_queue_count++;
     printf("Requesting in. Bus id: %d\n", id);
+    sem_post(&(data->mutex));
+    
     sem_post(&(data->st_mngr));
     // printf("Notified station mngr. Bus id: %d\n", id);
 
-    sem_wait(&(data->mutex));
-    data->in_queue_count++;
-    sem_post(&(data->mutex));
-
     sem_wait(&(data->in_queue));
-
     printf("Getting in station. Bus id: %d\n", id);
-    sem_wait(&(data->man));
 
-    printf("Maneuvering in station. Bus id: %d\n", id);
+    sem_wait(&(data->mutex));
+    printf("Here is my id. Bus id :%d\n", id);
+    data->curr_bus.id = temp_bus.id;
+    data->curr_bus.type = temp_bus.type;
+    sem_post(&(data->inform_receive));
+    sem_wait(&(data->inform_read));
+    sem_post(&(data->mutex));
+    
+    
+    sem_wait(&(data->inform_receive));
+    final_bay = data->curr_bus.final_bay;
+    spot = data->curr_bus.spot;
+    printf("Can proceed to bay %d\n", final_bay);
+
+    sem_wait(&(data->man));
+    printf("Maneuvering for parking. Bus id: %d\n", id);
     sleep((temp_bus.mantime));
     sem_post(&(data->man));
 
-    for(i = 0;i<3;i++){
-        final_bay = (temp_bus.type + i)%3;
-        if(*(bays[final_bay].current_num) + 1 <= *(bays[final_bay].max_num)){
-            memcpy(&(bays[final_bay].buses[*(bays[final_bay].current_num)]), &temp_bus, sizeof(bus));
-            (*(bays[final_bay].current_num))++;
-            
-            break;
-        }
-    }
 
-
-    printf("Parked. Bus id: %d\n", id);
+    printf("Parked in %d. Bus id: %d\n",final_bay, id);
     sem_post(&(data->in_station));
+    
+    
     // Inside...
     sleep((temp_bus.parkperiod));
 
+    sem_wait(&(data->man));
+
+    printf("Maneuvering to get out. Bus id: %d\n", id);
+    sleep((temp_bus.mantime));
+    sem_post(&(data->man));
+
     printf("Requesting out. Bus id: %d\n", id);
     sem_wait(&(data->mutex));
-    printf("Final bay %d current num %d\n", final_bay, *(bays[final_bay].current_num));
     (*(bays[final_bay].current_num))--;
-    printf("Final bay %d current num %d\n", final_bay, *(bays[final_bay].current_num));
     data->out_queue_count++;
     sem_post(&(data->mutex));
 
@@ -94,9 +101,17 @@ int main(int argc, char const *argv[]){
     sem_post(&(data->full));
     
     sem_wait(&(data->out_queue));
-    sem_post(&(data->in_station));
-    printf("Got out safely. Bus id: %d\n", id);
 
+    //Different memcpy
+    sem_wait(&(data->mutex));
+    memcpy(&(data->curr_bus), &(bays[final_bay].buses[spot]), sizeof(shm_bus));
+    sem_post(&(data->inform_receive));
+    sem_wait(&(data->inform_read));
+    sem_post(&(data->mutex));
+    
+   
+    printf("Got out safely. Bus id: %d\n", id);
+    sem_post(&(data->in_station));
 
 
 
