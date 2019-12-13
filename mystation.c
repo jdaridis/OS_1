@@ -68,11 +68,11 @@ int main(int argc, char const *argv[]){
     printf("Generate random buses or enter manually?\n");
     ans = getchar();
     if(ans == 'y'){
-        for(int i =0;i<4;i++){
+        for(int i =0;i<3;i++){
             sprintf(bus_people, "%d", rand()%bus_capacity);
             sprintf(bus_capacity_text, "%d", bus_capacity);
             sprintf(bus_parktime, "%d", rand()%10 + 1);
-            sprintf(bus_mantime, "%d", rand()%5);
+            sprintf(bus_mantime, "%d", rand()%5 + 1);
             t = rand()%3;
             switch(t){
                 case 0:

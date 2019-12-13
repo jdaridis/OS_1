@@ -36,10 +36,14 @@ typedef struct shm_data{
     sem_t in_station;
     sem_t inform_read;
     sem_t inform_receive;
-    sem_t comptroller;
+    sem_t bay_full;
+    sem_t bay_full_queue;
     sem_t mutex;
     shm_bay bays[3];
-    shm_bus curr_bus;
+    shm_bus in_bus;
+    shm_bus out_bus;
+    int blocked_bay;
+    int blocked_bay_queue;
     int capacity;
     int in_queue_count;
     int out_queue_count;
