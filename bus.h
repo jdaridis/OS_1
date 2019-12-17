@@ -7,4 +7,5 @@ typedef struct bus{
     int capacity;
     int parkperiod;
     int mantime;
+    long arrival_time;
 } bus;

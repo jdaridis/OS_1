@@ -9,6 +9,8 @@ typedef struct shm_bus{
     int type;
     long arrival_time;
     long leave_time;
+    long park_time;
+    int passengers;
     int final_bay;
     int spot;
     char status;
@@ -34,7 +36,6 @@ typedef struct shm_data{
     sem_t out_queue;
     sem_t man;
     sem_t in_station;
-    sem_t inform_read;
     sem_t inform_receive;
     sem_t bay_full;
     sem_t bay_full_queue;
@@ -43,7 +44,6 @@ typedef struct shm_data{
     shm_bus in_bus;
     shm_bus out_bus;
     int blocked_bay;
-    int blocked_bay_queue;
     int capacity;
     int in_queue_count;
     int out_queue_count;
