@@ -1,1 +1,12 @@
-15 3
+Capacity: 25
+Serve: 100
+
+Bay 0: 10
+Bay 1: 5
+Bay 2: 10
+
+Bus Capacity: 50
+Max park time: 5
+
+Snapshot time: 5
+Stats time: 10

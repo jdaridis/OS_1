@@ -3,6 +3,7 @@
         "string.h": "c",
         "stdio.h": "c",
         "stdlib.h": "c",
-        "shm_data.h": "c"
+        "shm_data.h": "c",
+        "bus.h": "c"
     }
 }
